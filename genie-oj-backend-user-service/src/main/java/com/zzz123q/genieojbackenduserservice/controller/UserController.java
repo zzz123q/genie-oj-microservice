@@ -42,7 +42,7 @@ import static com.zzz123q.genieojbackenduserservice.service.impl.UserServiceImpl
  * 用户接口
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/")
 @Slf4j
 @Api(tags = "用户接口")
 public class UserController {

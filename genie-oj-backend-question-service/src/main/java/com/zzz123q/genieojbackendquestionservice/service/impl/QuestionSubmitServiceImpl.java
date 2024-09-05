@@ -21,8 +21,8 @@ import com.zzz123q.genieojbackendmodel.model.vo.QuestionSubmitVO;
 import com.zzz123q.genieojbackendquestionservice.mapper.QuestionSubmitMapper;
 import com.zzz123q.genieojbackendquestionservice.service.QuestionService;
 import com.zzz123q.genieojbackendquestionservice.service.QuestionSubmitService;
-import com.zzz123q.genieojbackendserviceclient.service.JudgeService;
-import com.zzz123q.genieojbackendserviceclient.service.UserService;
+import com.zzz123q.genieojbackendserviceclient.service.JudgeFeignClient;
+import com.zzz123q.genieojbackendserviceclient.service.UserFeignClient;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
@@ -50,10 +50,10 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     @Resource
     private QuestionService questionService;
     @Resource
-    private UserService userService;
+    private UserFeignClient userFeignClient;
     @Resource
     @Lazy
-    private JudgeService judgeService;
+    private JudgeFeignClient judgeFeignClient;
 
     /**
      * 题目提交
@@ -91,7 +91,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         // 执行判题服务
         Long questionSubmitId = questionSubmit.getId();
         CompletableFuture.runAsync(() -> {
-            QuestionSubmit questionSubmitAfterJudge = judgeService.doJudge(questionSubmitId);
+            QuestionSubmit questionSubmitAfterJudge = judgeFeignClient.doJudge(questionSubmitId);
             JudgeInfo judgeInfo = JSONUtil.toBean(questionSubmitAfterJudge.getJudgeInfo(), JudgeInfo.class);
             Question questionUpdate = questionService.getById(questionId);
             Integer submitNum = questionUpdate.getSubmitNum();
@@ -157,7 +157,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
 
         // 脱敏: (管理员与用户本人可以看见全部信息, 非用户本人只能看到部分公开信息)
         long userId = loginUser.getId();
-        if (userId != questionSubmit.getUserId() && !userService.isAdmin(loginUser)) {
+        if (userId != questionSubmit.getUserId() && !userFeignClient.isAdmin(loginUser)) {
             questionSubmitVO.setCode(null);
         }
 
