@@ -15,11 +15,15 @@ import com.zzz123q.genieojbackendquestionservice.service.QuestionService;
 import com.zzz123q.genieojbackendquestionservice.service.QuestionSubmitService;
 import com.zzz123q.genieojbackendserviceclient.service.QuestionFeignClient;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 /**
  * 该接口仅用于项目内部调用
  */
 @RestController
 @RequestMapping("/inner")
+@Api(tags = "题目内部接口")
 public class QuestionInnerController implements QuestionFeignClient {
 
     @Resource
@@ -36,6 +40,7 @@ public class QuestionInnerController implements QuestionFeignClient {
      */
     @Override
     @GetMapping("/get/id")
+    @ApiOperation("根据id获取题目")
     public Question getQuestionById(@RequestParam("questionId") long questionId) {
         return questionService.getById(questionId);
     }
@@ -48,6 +53,7 @@ public class QuestionInnerController implements QuestionFeignClient {
      */
     @Override
     @GetMapping("/question_submit/get/id")
+    @ApiOperation("根据id获取题目提交")
     public QuestionSubmit getQuestionSubmitById(@RequestParam("questionSubmitId") long questionSubmitId) {
         return questionSubmitService.getById(questionSubmitId);
     }
@@ -60,6 +66,7 @@ public class QuestionInnerController implements QuestionFeignClient {
      */
     @Override
     @PostMapping("question_submit/update")
+    @ApiOperation("更新题目提交信息")
     public boolean updateQuestionSubmitById(@RequestBody QuestionSubmit questionSubmit) {
         return questionSubmitService.updateById(questionSubmit);
     }

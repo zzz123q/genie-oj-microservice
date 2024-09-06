@@ -14,11 +14,15 @@ import com.zzz123q.genieojbackendmodel.model.entity.User;
 import com.zzz123q.genieojbackendserviceclient.service.UserFeignClient;
 import com.zzz123q.genieojbackenduserservice.service.UserService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 /**
  * 该接口仅用于项目内部调用
  */
 @RestController
 @RequestMapping("/inner")
+@Api(tags = "用户内部接口")
 public class UserInnerController implements UserFeignClient {
 
     @Resource
@@ -32,6 +36,7 @@ public class UserInnerController implements UserFeignClient {
      */
     @Override
     @GetMapping("/get/id")
+    @ApiOperation("根据id获取用户")
     public User getById(@RequestParam("userId") long userId) {
         return userService.getById(userId);
     }
@@ -44,6 +49,7 @@ public class UserInnerController implements UserFeignClient {
      */
     @Override
     @GetMapping("/get/ids")
+    @ApiOperation("根据id获取一组用户")
     public List<User> listByIds(@RequestParam("ids") Collection<Long> ids) {
         return userService.listByIds(ids);
     }
