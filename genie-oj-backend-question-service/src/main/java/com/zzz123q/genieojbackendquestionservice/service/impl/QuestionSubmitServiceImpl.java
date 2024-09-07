@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zzz123q.genieojbackendcommon.constant.CommonConstant;
+import com.zzz123q.genieojbackendcommon.constant.MessageConstant;
 import com.zzz123q.genieojbackendcommon.exception.BusinessException;
 import com.zzz123q.genieojbackendcommon.result.ErrorCode;
 import com.zzz123q.genieojbackendcommon.utils.SqlUtils;
@@ -19,6 +20,7 @@ import com.zzz123q.genieojbackendmodel.model.enums.QuestionSubmitLanguageEnum;
 import com.zzz123q.genieojbackendmodel.model.enums.QuestionSubmitStatusEnum;
 import com.zzz123q.genieojbackendmodel.model.vo.QuestionSubmitVO;
 import com.zzz123q.genieojbackendquestionservice.mapper.QuestionSubmitMapper;
+import com.zzz123q.genieojbackendquestionservice.message.MessageProducer;
 import com.zzz123q.genieojbackendquestionservice.service.QuestionService;
 import com.zzz123q.genieojbackendquestionservice.service.QuestionSubmitService;
 import com.zzz123q.genieojbackendserviceclient.service.JudgeFeignClient;
@@ -54,6 +56,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     @Resource
     @Lazy
     private JudgeFeignClient judgeFeignClient;
+    @Resource
+    private MessageProducer messageProducer;
 
     /**
      * 题目提交
@@ -88,28 +92,34 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目提交失败");
         }
 
-        // 执行判题服务
         Long questionSubmitId = questionSubmit.getId();
-        CompletableFuture.runAsync(() -> {
-            QuestionSubmit questionSubmitAfterJudge = judgeFeignClient.doJudge(questionSubmitId);
-            JudgeInfo judgeInfo = JSONUtil.toBean(questionSubmitAfterJudge.getJudgeInfo(), JudgeInfo.class);
-            Question questionUpdate = questionService.getById(questionId);
-            Integer submitNum = questionUpdate.getSubmitNum();
-            Integer acceptedNum = questionUpdate.getAcceptedNum();
-            BigDecimal passingRate = questionUpdate.getPassingRate();
-            submitNum++;
-            if (judgeInfo.getMessage().equals(JudgeInfoMessageEnum.ACCEPTED.getValue())) {
-                acceptedNum++;
-            }
-            passingRate = BigDecimal.valueOf((acceptedNum + 0.0) / submitNum);
-            questionUpdate.setSubmitNum(submitNum);
-            questionUpdate.setAcceptedNum(acceptedNum);
-            questionUpdate.setPassingRate(passingRate);
-            boolean update = questionService.updateById(questionUpdate);
-            if (!update) {
-                throw new BusinessException(ErrorCode.OPERATION_ERROR, "题目状态更新失败");
-            }
-        });
+        messageProducer.sendMessage(MessageConstant.EXCHANGE_NAME, MessageConstant.ROUTING_KEY,
+                String.valueOf(questionSubmitId));
+
+        // 执行判题服务
+        // CompletableFuture.runAsync(() -> {
+        // QuestionSubmit questionSubmitAfterJudge =
+        // judgeFeignClient.doJudge(questionSubmitId);
+        // JudgeInfo judgeInfo =
+        // JSONUtil.toBean(questionSubmitAfterJudge.getJudgeInfo(), JudgeInfo.class);
+        // Question questionUpdate = questionService.getById(questionId);
+        // Integer submitNum = questionUpdate.getSubmitNum();
+        // Integer acceptedNum = questionUpdate.getAcceptedNum();
+        // BigDecimal passingRate = questionUpdate.getPassingRate();
+        // submitNum++;
+        // if (judgeInfo.getMessage().equals(JudgeInfoMessageEnum.ACCEPTED.getValue()))
+        // {
+        // acceptedNum++;
+        // }
+        // passingRate = BigDecimal.valueOf((acceptedNum + 0.0) / submitNum);
+        // questionUpdate.setSubmitNum(submitNum);
+        // questionUpdate.setAcceptedNum(acceptedNum);
+        // questionUpdate.setPassingRate(passingRate);
+        // boolean update = questionService.updateById(questionUpdate);
+        // if (!update) {
+        // throw new BusinessException(ErrorCode.OPERATION_ERROR, "题目状态更新失败");
+        // }
+        // });
 
         return questionSubmitId;
     }

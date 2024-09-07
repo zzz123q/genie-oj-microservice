@@ -46,6 +46,19 @@ public class QuestionInnerController implements QuestionFeignClient {
     }
 
     /**
+     * 根据判题完成的题目提交id更新题目统计数据
+     * 
+     * @param questionSubmitId
+     * @return
+     */
+    @Override
+    @PostMapping("/update/id")
+    @ApiOperation("根据判题完成的题目提交id更新题目统计数据")
+    public boolean updateQuestionBySubmitId(@RequestParam("questionSubmitId") long questionSubmitId) {
+        return questionService.updateQuestionBySubmitId(questionSubmitId);
+    }
+
+    /**
      * 根据id获取题目提交
      * 
      * @param questionSubmitId

@@ -8,9 +8,12 @@ import com.zzz123q.genieojbackendcommon.exception.BusinessException;
 import com.zzz123q.genieojbackendcommon.exception.ThrowUtils;
 import com.zzz123q.genieojbackendcommon.result.ErrorCode;
 import com.zzz123q.genieojbackendcommon.utils.SqlUtils;
+import com.zzz123q.genieojbackendmodel.model.codesandbox.JudgeInfo;
 import com.zzz123q.genieojbackendmodel.model.dto.question.QuestionQueryRequest;
 import com.zzz123q.genieojbackendmodel.model.entity.Question;
+import com.zzz123q.genieojbackendmodel.model.entity.QuestionSubmit;
 import com.zzz123q.genieojbackendmodel.model.entity.User;
+import com.zzz123q.genieojbackendmodel.model.enums.JudgeInfoMessageEnum;
 import com.zzz123q.genieojbackendmodel.model.vo.QuestionVO;
 import com.zzz123q.genieojbackendmodel.model.vo.UserVO;
 import com.zzz123q.genieojbackendquestionservice.mapper.QuestionMapper;
@@ -19,8 +22,10 @@ import com.zzz123q.genieojbackendquestionservice.service.QuestionService;
 import com.zzz123q.genieojbackendserviceclient.service.UserFeignClient;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 题目(question)表服务实现
@@ -182,5 +188,35 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         }).collect(Collectors.toList());
         questionVOPage.setRecords(questionVOList);
         return questionVOPage;
+    }
+
+    /**
+     * 根据判题完成的题目提交id更新题目统计数据
+     * 
+     * @param questionSubmitId
+     * @return
+     */
+    @Transactional
+    public boolean updateQuestionBySubmitId(long questionSubmitId) {
+        QuestionSubmit questionSubmitAfterJudge = questionSubmitMapper.selectById(questionSubmitId);
+        JudgeInfo judgeInfo = JSONUtil.toBean(questionSubmitAfterJudge.getJudgeInfo(), JudgeInfo.class);
+        Long questionId = questionSubmitAfterJudge.getQuestionId();
+        Question questionUpdate = getById(questionId);
+        Integer submitNum = questionUpdate.getSubmitNum();
+        Integer acceptedNum = questionUpdate.getAcceptedNum();
+        BigDecimal passingRate = questionUpdate.getPassingRate();
+        submitNum++;
+        if (judgeInfo.getMessage().equals(JudgeInfoMessageEnum.ACCEPTED.getValue())) {
+            acceptedNum++;
+        }
+        passingRate = BigDecimal.valueOf((acceptedNum + 0.0) / submitNum);
+        questionUpdate.setSubmitNum(submitNum);
+        questionUpdate.setAcceptedNum(acceptedNum);
+        questionUpdate.setPassingRate(passingRate);
+        boolean update = updateById(questionUpdate);
+        if (!update) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "题目状态更新失败");
+        }
+        return update;
     }
 }

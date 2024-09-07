@@ -26,6 +26,15 @@ public interface QuestionFeignClient {
     Question getQuestionById(@RequestParam("questionId") long questionId);
 
     /**
+     * 根据判题完成的题目提交id更新题目统计数据
+     * 
+     * @param questionSubmitId
+     * @return
+     */
+    @PostMapping("/update/id")
+    boolean updateQuestionBySubmitId(@RequestParam("questionSubmitId") long questionSubmitId);
+
+    /**
      * 根据id获取题目提交
      * 
      * @param questionSubmitId

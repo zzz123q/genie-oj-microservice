@@ -8,6 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import com.zzz123q.genieojbackendjudgeservice.message.InitRabbitMq;
+
 @SpringBootApplication
 @ComponentScan("com.zzz123q")
 @EnableScheduling
@@ -17,6 +19,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class GenieOjBackendJudgeServiceApplication {
 
     public static void main(String[] args) {
+        // 启动消息队列
+        InitRabbitMq.doInit();
         SpringApplication.run(GenieOjBackendJudgeServiceApplication.class, args);
     }
 

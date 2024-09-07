@@ -46,4 +46,12 @@ public interface QuestionService extends IService<Question> {
      * @return
      */
     Page<QuestionVO> getQuestionVOPage(Page<Question> questionPage, HttpServletRequest request);
+
+    /**
+     * 根据判题完成的题目提交id更新题目统计数据
+     * 
+     * @param questionSubmitId
+     * @return
+     */
+    boolean updateQuestionBySubmitId(long questionSubmitId);
 }
