@@ -38,6 +38,6 @@
   - 公用模块（genie-oj-backend-common）：全局异常处理、请求响应封装类、常量类、工具类等
   - 模型模块（genie-oj-backend-model）：实体类、DTO类、VO类、枚举类等
   - 内部接口模块（genie-oj-backend-service-client）：项目内部服务需要使用的接口定义
-- 用户服务（genie-oj-backend-user-service）
-- 题目服务（genie-oj-backend-question-service）
-- 判题服务（genie-oj-backend-judge-service）
+- 用户服务（genie-oj-backend-user-service）：原用户模块
+- 题目服务（genie-oj-backend-question-service）：原题目模块
+- 判题服务（genie-oj-backend-judge-service）：原判题模块
