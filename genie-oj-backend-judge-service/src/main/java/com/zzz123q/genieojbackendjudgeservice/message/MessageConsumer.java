@@ -46,7 +46,7 @@ public class MessageConsumer {
             questionFeignClient.updateQuestionBySubmitId(questionSubmitId);
             channel.basicAck(deliveryTag, false);
         } catch (Exception e) {
-            channel.basicNack(deliveryTag, false, true);
+            channel.basicNack(deliveryTag, false, false);
         }
     }
 }

@@ -28,26 +28,39 @@ server:
 knife4j:
   gateway:
     enabled: true
-    strategy: discover
+    strategy: manual
     tags-sorter: order
     operations-sorter: order
-    discover:
-      enabled: true
-      version: swagger2
-      excluded-services:
-        - genie-oj-backend-gateway
-      swagger2:
-        url: /v2/api-docs?group=default
-      service-config:
-        genie-oj-backend-user-service:
-          group-name: 用户服务
-          order: 1
-          context-path: /oj/user
-        genie-oj-backend-question-service:
-          group-name: 题目服务
-          order: 2
-          context-path: /oj/question
-        genie-oj-backend-judge-service:
-          group-name: 判题服务
-          order: 3
-          context-path: /oj/judge
+    routes:
+      - name: 用户服务
+        url: /oj/user/v2/api-docs?group=default
+        service-name: genie-oj-backend-user-service
+        order: 1
+      - name: 题目服务
+        url: /oj/question/v2/api-docs?group=default
+        service-name: genie-oj-backend-question-service
+        order: 2
+      - name: 判题服务
+        url: /oj/judge/v2/api-docs?group=default
+        service-name: genie-oj-backend-judge-service
+        order: 3
+    # discover:
+    #   enabled: true
+    #   version: swagger2
+    #   excluded-services:
+    #     - genie-oj-backend-gateway
+    #   # swagger2:
+    #   #   url: /v2/api-docs?group=default
+    #   service-config:
+    #     genie-oj-backend-user-service:
+    #       group-name: 用户服务
+    #       order: 1
+    #       context-path: /oj/user
+    #     genie-oj-backend-question-service:
+    #       group-name: 题目服务
+    #       order: 2
+    #       context-path: /oj/question
+    #     genie-oj-backend-judge-service:
+    #       group-name: 判题服务
+    #       order: 3
+    #       context-path: /oj/judge
