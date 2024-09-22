@@ -11,22 +11,37 @@ public interface MessageConstant {
     String HOST = "localhost";
 
     /**
-     * 交换机名称
+     * 判题队列交换机
      */
-    String EXCHANGE_NAME = "code_exchange";
+    String CODE_EXCHANGE = "code_exchange";
 
     /**
-     * 交换机类型
+     * 判题队列名称
      */
-    String EXCHANGE_TYPE = "direct";
+    String CODE_QUEUE = "code_queue";
 
     /**
-     * 队列名称
+     * 判题队列路由键名称
      */
-    String QUEUE_NAME = "code_queue";
+    String CODE_ROUTINGKEY = "code_routingKey";
 
     /**
-     * 路由键名称
+     * 提交队列交换机
      */
-    String ROUTING_KEY = "my_routingKey";
+    String SUBMIT_EXCHANGE = "submit_exchange";
+
+    /**
+     * 前端提交队列名称
+     */
+    String SUBMIT_QUEUE_FRONTEND = "submit_queue_frontend";
+
+    /**
+     * 后端提交队列名称
+     */
+    String SUBMIT_QUEUE_BACKEND = "submit_queue_backend";
+
+    /**
+     * 提交队列路由键名称(在订阅模式中无意义)
+     */
+    String SUBMIT_ROUTINGKEY = "submit_routingKey";
 }

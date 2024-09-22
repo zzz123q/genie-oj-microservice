@@ -15,11 +15,20 @@ public class InitRabbitMq {
             connectionFactory.setHost(MessageConstant.HOST);
             Connection connection = connectionFactory.newConnection();
             Channel channel = connection.createChannel();
-            channel.exchangeDeclare(MessageConstant.EXCHANGE_NAME, MessageConstant.EXCHANGE_TYPE);
+            // 创建交换机
+            channel.exchangeDeclare(MessageConstant.CODE_EXCHANGE, "direct");
+            channel.exchangeDeclare(MessageConstant.SUBMIT_EXCHANGE, "fanout");
 
-            // 创建队列,随机分配一个队列名称
-            channel.queueDeclare(MessageConstant.QUEUE_NAME, true, false, false, null);
-            channel.queueBind(MessageConstant.QUEUE_NAME, MessageConstant.EXCHANGE_NAME, MessageConstant.ROUTING_KEY);
+            // 创建代码队列
+            channel.queueDeclare(MessageConstant.CODE_QUEUE, true, false, false, null);
+            channel.queueBind(MessageConstant.CODE_QUEUE, MessageConstant.CODE_EXCHANGE,
+                    MessageConstant.CODE_ROUTINGKEY);
+
+            // 创建提交队列
+            channel.queueDeclare(MessageConstant.SUBMIT_QUEUE_BACKEND, true, false, false, null);
+            channel.queueBind(MessageConstant.SUBMIT_QUEUE_BACKEND, MessageConstant.SUBMIT_EXCHANGE,
+                    MessageConstant.SUBMIT_ROUTINGKEY);
+
             log.info("\n消息队列启动成功!!!\n");
         } catch (Exception e) {
             log.error("\n消息队列启动失败!!!\n");

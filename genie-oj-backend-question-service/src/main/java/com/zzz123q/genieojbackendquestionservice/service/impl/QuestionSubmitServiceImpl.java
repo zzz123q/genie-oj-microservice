@@ -20,7 +20,7 @@ import com.zzz123q.genieojbackendmodel.model.enums.QuestionSubmitLanguageEnum;
 import com.zzz123q.genieojbackendmodel.model.enums.QuestionSubmitStatusEnum;
 import com.zzz123q.genieojbackendmodel.model.vo.QuestionSubmitVO;
 import com.zzz123q.genieojbackendquestionservice.mapper.QuestionSubmitMapper;
-import com.zzz123q.genieojbackendquestionservice.message.MessageProducer;
+import com.zzz123q.genieojbackendquestionservice.message.QuestionMessageManager;
 import com.zzz123q.genieojbackendquestionservice.service.QuestionService;
 import com.zzz123q.genieojbackendquestionservice.service.QuestionSubmitService;
 import com.zzz123q.genieojbackendserviceclient.service.JudgeFeignClient;
@@ -57,7 +57,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     @Lazy
     private JudgeFeignClient judgeFeignClient;
     @Resource
-    private MessageProducer messageProducer;
+    private QuestionMessageManager questionMessageManager;
 
     /**
      * 题目提交
@@ -93,7 +93,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         }
 
         Long questionSubmitId = questionSubmit.getId();
-        messageProducer.sendMessage(MessageConstant.EXCHANGE_NAME, MessageConstant.ROUTING_KEY,
+        questionMessageManager.sendMessage(MessageConstant.CODE_EXCHANGE, MessageConstant.CODE_ROUTINGKEY,
                 String.valueOf(questionSubmitId));
 
         // 执行判题服务

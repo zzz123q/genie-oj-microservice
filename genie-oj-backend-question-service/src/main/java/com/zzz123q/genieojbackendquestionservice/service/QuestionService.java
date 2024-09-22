@@ -2,11 +2,14 @@ package com.zzz123q.genieojbackendquestionservice.service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zzz123q.genieojbackendmodel.model.dto.question.QuestionQueryRequest;
 import com.zzz123q.genieojbackendmodel.model.entity.Question;
+import com.zzz123q.genieojbackendmodel.model.entity.QuestionSubmit;
 import com.zzz123q.genieojbackendmodel.model.vo.QuestionVO;
 
 /**
@@ -54,4 +57,13 @@ public interface QuestionService extends IService<Question> {
      * @return
      */
     boolean updateQuestionBySubmitId(long questionSubmitId);
+
+    /**
+     * 根据判题完成的题目提交信息更新题目统计数据
+     * 
+     * @param questionSubmitId
+     * @return
+     */
+    @Transactional
+    boolean updateQuestionBySubmit(QuestionSubmit questionSubmit);
 }

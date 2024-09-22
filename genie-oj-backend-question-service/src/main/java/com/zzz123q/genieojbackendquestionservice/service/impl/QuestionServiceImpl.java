@@ -219,4 +219,33 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         }
         return update;
     }
+
+    /**
+     * 根据判题完成的题目提交信息更新题目统计数据
+     * 
+     * @param questionSubmitId
+     * @return
+     */
+    @Transactional
+    public boolean updateQuestionBySubmit(QuestionSubmit questionSubmit) {
+        JudgeInfo judgeInfo = JSONUtil.toBean(questionSubmit.getJudgeInfo(), JudgeInfo.class);
+        Long questionId = questionSubmit.getQuestionId();
+        Question questionUpdate = getById(questionId);
+        Integer submitNum = questionUpdate.getSubmitNum();
+        Integer acceptedNum = questionUpdate.getAcceptedNum();
+        BigDecimal passingRate = questionUpdate.getPassingRate();
+        submitNum++;
+        if (judgeInfo.getMessage().equals(JudgeInfoMessageEnum.ACCEPTED.getValue())) {
+            acceptedNum++;
+        }
+        passingRate = BigDecimal.valueOf((acceptedNum + 0.0) / submitNum);
+        questionUpdate.setSubmitNum(submitNum);
+        questionUpdate.setAcceptedNum(acceptedNum);
+        questionUpdate.setPassingRate(passingRate);
+        boolean update = updateById(questionUpdate);
+        if (!update) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "题目状态更新失败");
+        }
+        return update;
+    }
 }
